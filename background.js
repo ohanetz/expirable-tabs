@@ -46,11 +46,9 @@ function onError(err) {
 }
 
 function updateTabsExpiry(item) {
-  console.log("Tabs Expiry:");
   if (item.tabsExpiry !== undefined) {
     tabsExpiry = item.tabsExpiry;
   }
-  console.log(tabsExpiry);
 
   for (let key of Object.keys(tabsExpiry)) {
     let now = new Date();

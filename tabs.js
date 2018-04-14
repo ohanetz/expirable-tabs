@@ -99,9 +99,6 @@ function updateSettings() {
 	let tabsExpiry = {};
 	let dateInputs = document.getElementsByClassName("tab-expiry-date");
 	for (let item of dateInputs) {
-		console.log(item.getAttribute("tab-id"));
-		console.log(item.valueAsDate);
-		console.log(item.getAttribute("value"));
 		tabsExpiry[item.getAttribute("tab-id")] = {
 			url: item.getAttribute("tab-url"),
 			expiry: item.valueAsDate
