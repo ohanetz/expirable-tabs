@@ -29,13 +29,25 @@ function buildTabExpirationSettings(item) {
       tabTr.appendChild(tabUrlTd);
 
       let tabDate = tabsExpiry[tab.id]["expiry"];
+
+      let tabExpiresInTd = document.createElement("td");
+      tabExpiresInTd.textContent = "days";
+      let tabExpiresInInput = document.createElement("input");
+      tabExpiresInInput.setAttribute("class", "tab-expire-days");
+      tabExpiresInInput.setAttribute("tab-id", tab.id);
+      tabExpiresInInput.setAttribute("tab-url", btoa(tab.url));
+      tabExpiresInInput.setAttribute("type", "number");
+      tabExpiresInInput.setAttribute("value", getDaysDistance(tabDate));
+      tabExpiresInTd.appendChild(tabExpiresInInput);
+      tabTr.appendChild(tabExpiresInTd);
+
       let tabDateTd = document.createElement("td");
       let tabDateInput = document.createElement("input");
       tabDateInput.setAttribute("class", "tab-expiry-date");
       tabDateInput.setAttribute("tab-id", tab.id);
       tabDateInput.setAttribute("tab-url", btoa(tab.url));
       tabDateInput.setAttribute("type", "date");
-      tabDateInput.setAttribute("value", tabDate.getFullYear() + "-" + getMonthStr(tabDate.getMonth()) + "-" + tabDate.getDate());
+      tabDateInput.setAttribute("value", tabDate.getFullYear() + "-" + getMonthStr(tabDate.getMonth()) + "-" + getDayStr(tabDate.getDate()));
       tabDateTd.appendChild(tabDateInput);
       tabTr.appendChild(tabDateTd);
 
@@ -46,6 +58,16 @@ function buildTabExpirationSettings(item) {
   });
 }
 
+function getDaysDistance(date) {
+	let today = new Date();
+	var timeDiff = date.getTime() - today.getTime();
+	if (timeDiff < 0) {
+		return 0;
+	}
+
+	return Math.ceil(timeDiff / (1000 * 3600 * 24)); 
+}
+
 function getSettingsAndBuildTabExpirationSettings() {
 	browser.storage.local.get("tabsExpiry")
 		.then(buildTabExpirationSettings, onError);
@@ -53,6 +75,14 @@ function getSettingsAndBuildTabExpirationSettings() {
 
 function onError(err) {
   console.log(err);
+}
+
+function getDayStr(day) {
+	if (day < 10) {
+		return "0" + day;
+	}
+
+	return day;
 }
 
 function getMonthStr(month) {
@@ -69,6 +99,9 @@ function updateSettings() {
 	let tabsExpiry = {};
 	let dateInputs = document.getElementsByClassName("tab-expiry-date");
 	for (let item of dateInputs) {
+		console.log(item.getAttribute("tab-id"));
+		console.log(item.valueAsDate);
+		console.log(item.getAttribute("value"));
 		tabsExpiry[item.getAttribute("tab-id")] = {
 			url: item.getAttribute("tab-url"),
 			expiry: item.valueAsDate
@@ -86,6 +119,28 @@ function getCurrentWindowTabs() {
 
 document.addEventListener("DOMContentLoaded", getSettingsAndBuildTabExpirationSettings);
 document.querySelector("form").addEventListener("submit", updateSettings);
+
+window.addEventListener('input', function (e) {
+ if (e.target.getAttribute("class") === "tab-expiry-date") {
+ 	for (let elem of document.getElementsByClassName("tab-expire-days")) {
+ 		if (elem.getAttribute("tab-id") === e.target.getAttribute("tab-id")) {
+ 			elem.setAttribute("value", getDaysDistance(e.target.valueAsDate));
+ 			break;
+ 		}
+ 	}
+
+ }
+
+ if (e.target.getAttribute("class") === "tab-expire-days") {
+ 	for (let elem of document.getElementsByClassName("tab-expiry-date")) {
+ 		if (elem.getAttribute("tab-id") === e.target.getAttribute("tab-id")) {
+ 			let newTabDate = new Date(new Date().valueOf() + 864E5 * e.target.valueAsNumber)
+ 			elem.setAttribute("value", newTabDate.getFullYear() + "-" + getMonthStr(newTabDate.getMonth()) + "-" + getDayStr(newTabDate.getDate()));
+ 			break;
+ 		}
+ 	}
+ }
+}, false);
 
 
 // function updateTabsExpiry(item) {

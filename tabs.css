@@ -37,3 +37,9 @@ tr:nth-child(even) {
 	height: 16px;
 	width: 16px;
 }
+
+.tab-expire-days {
+	float: left; 
+	max-width: 75px; 
+	margin-right: 4px;
+}

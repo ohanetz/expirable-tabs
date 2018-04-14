@@ -1,5 +1,3 @@
-const MAX_DATE = 8640000000000000;
-
 let tabsExpiry = {};
 
 
@@ -28,7 +26,7 @@ function updateCount(tabId, isOnRemoved) {
         // Tab was or new tab, resetting expiry.
         tabsExpiry[tab.id] = {
           url: btoa(tab.url), 
-          expiry: new Date(MAX_DATE)
+          expiry: new Date("2099-12-31")
         };
         console.log("New tab in expiry:" + tabsExpiry[tab.id]);
         newTab = true;
